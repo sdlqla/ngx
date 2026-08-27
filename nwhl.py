@@ -9,8 +9,7 @@ OLD_TXT_URL = "https://www.xn--rgv465a.top/live/Daily.txt"
 
 
 def normalize_group_name(group_str):
-    """清理 Emoji 和符号，并将分类统一清洗重命名"""
-    # 移除表情和特殊符号，只保留汉字、字母和数字
+    """清理 Emoji 并统一分类名称"""
     cleaned = re.sub(r"[^\u4e00-\u9fa5a-zA-Z0-9]", "", group_str)
 
     if "央视" in cleaned:
@@ -27,22 +26,9 @@ def normalize_group_name(group_str):
         return cleaned
 
 
-# 存储分类数据：{ "广东频道": [ ("广东珠江", "http://..."), ... ] }
-grouped_data = {}
-
-
-def add_channel(group, name, url):
-    """统一添加并归类频道"""
-    clean_group = normalize_group_name(group)
-    if not clean_group or not name or not url:
-        return
-    if clean_group not in grouped_data:
-        grouped_data[clean_group] = []
-    grouped_data[clean_group].append((name, url))
-
-
 def parse_m3u(content):
-    """解析 M3U 格式"""
+    """解析 Guovin 的 M3U 源"""
+    data = {}
     lines = content.splitlines()
     current_group = "其他"
     current_name = ""
@@ -52,19 +38,22 @@ def parse_m3u(content):
         if line.startswith("#EXTINF"):
             group_match = re.search(r'group-title="([^"]+)"', line)
             current_group = group_match.group(1) if group_match else "其他"
-
             if "," in line:
                 current_name = line.split(",")[-1].strip()
             else:
                 current_name = "未知频道"
-
         elif line and not line.startswith("#"):
             if current_name:
-                add_channel(current_group, current_name, line)
+                cg = normalize_group_name(current_group)
+                if cg not in data:
+                    data[cg] = []
+                data[cg].append((current_name, line))
+    return data
 
 
 def parse_txt(content):
-    """解析 TXT 格式"""
+    """解析旧 TXT 源"""
+    data = {}
     current_group = "其他"
     for line in content.splitlines():
         line = line.strip()
@@ -76,42 +65,58 @@ def parse_txt(content):
             parts = line.split(",")
             name = parts[0].strip()
             url = parts[1].strip()
-            add_channel(current_group, name, url)
+            cg = normalize_group_name(current_group)
+            if cg not in data:
+                data[cg] = []
+            data[cg].append((name, url))
+    return data
 
 
-# --- 1. 抓取并解析 Guovin 源 ---
+# --- 1. 分别抓取并解析两个源 ---
+guovin_data = {}
+old_data = {}
+
 print("正在获取 Guovin M3U 源...")
 try:
     res1 = requests.get(GUOVIN_M3U_URL, timeout=15)
     if res1.status_code == 200:
-        parse_m3u(res1.text)
+        guovin_data = parse_m3u(res1.text)
 except Exception as e:
     print(f"获取 Guovin 源失败: {e}")
 
-# --- 2. 抓取并解析旧源 ---
-print("正在合并旧 TXT 源...")
+print("正在获取旧 TXT 源...")
 try:
     res2 = requests.get(OLD_TXT_URL, timeout=15)
     if res2.status_code == 200:
-        parse_txt(res2.text)
+        old_data = parse_txt(res2.text)
 except Exception as e:
-    print(f"获取旧源失败/跳过: {e}")
+    print(f"获取旧源失败: {e}")
 
-# --- 3. 按照固定顺序去重并导出 ---
+# --- 2. 按自定义优先级合并并导出 ---
 OUTPUT_ORDER = ["央视频道", "卫视频道", "广东频道", "港澳台"]
 
-print("正在清洗合并并生成 my.txt...")
+print("正在按优先级去重合并并生成 my.txt...")
 with open("my.txt", "w", encoding="utf-8") as f:
     for group in OUTPUT_ORDER:
-        if group in grouped_data and grouped_data[group]:
-            f.write(f"{group},#genre#\n")
+        # 针对不同分类设定不同的主辅优先级
+        if group == "港澳台":
+            # 港澳台：旧 TXT 为主，Guovin 为辅
+            primary_list = old_data.get(group, [])
+            secondary_list = guovin_data.get(group, [])
+        else:
+            # 央视/卫视/广东：Guovin 为主，旧 TXT 为辅
+            primary_list = guovin_data.get(group, [])
+            secondary_list = old_data.get(group, [])
 
+        combined_list = primary_list + secondary_list
+
+        if combined_list:
+            f.write(f"{group},#genre#\n")
             seen_pairs = set()
-            for name, url in grouped_data[group]:
+            for name, url in combined_list:
                 if (name, url) not in seen_pairs:
                     seen_pairs.add((name, url))
                     f.write(f"{name},{url}\n")
-
             f.write("\n")
 
 print("更新完成！")
