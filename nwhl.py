@@ -42,7 +42,7 @@ except Exception as e:
     print(f"Daily.txt 获取失败: {e}")
 
 
-# 2. 从 Guovin 获取央视、卫视、广东（独占），以及精准匹配 tvg-id="翡翠台" 的港台源（补充）
+# 2. 从 Guovin 获取央视、卫视、广东（独占），以及精准匹配港台源（补充）
 guovin_data = {"央视频道": [], "卫视频道": [], "广东频道": [], "港澳台": []}
 
 try:
@@ -80,10 +80,16 @@ try:
                         guovin_data["卫视频道"].append((current_name, line))
                     elif "广东" in g_clean or "广州" in n_clean:
                         guovin_data["广东频道"].append((current_name, line))
-                    # 港台频道：匹配 tvg-id="翡翠台" 或 频道名/分组包含翡翠/港台
-                    elif tvg_id == "翡翠台" or any(
-                        k in (g_clean + n_clean).upper()
-                        for k in ["翡翠", "TVB", "港", "台", "澳", "凤凰"]
+                    # 港台频道：精确匹配 tvg-id、频道关键字，或“港澳台”完整分组名（绝不单独匹配单字“台”）
+                    elif (
+                        tvg_id == "翡翠台"
+                        or any(
+                            k in n_clean.upper()
+                            for k in ["TVB", "翡翠", "明珠", "TVBS", "凤凰"]
+                        )
+                        or any(
+                            k in g_clean for k in ["港澳台", "港台", "香港", "台湾"]
+                        )
                     ):
                         guovin_data["港澳台"].append(
                             (normalize_name(current_name), line)
@@ -106,7 +112,7 @@ with open("my.txt", "w", encoding="utf-8") as f:
                     f.write(f"{name},{url}\n")
             f.write("\n")
 
-    # 港澳台（Daily 的 TVB翡翠 排前面，Guovin 的 tvg-id="翡翠台" 排后面）
+    # 港澳台（Daily 的 TVB/翡翠等排前面，Guovin 补在后面）
     combined_hk = daily_hk + guovin_data["港澳台"]
     if combined_hk:
         f.write("港澳台,#genre#\n")
