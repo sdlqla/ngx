@@ -5,52 +5,67 @@ import requests
 GUOVIN_M3U_URL = (
     "https://raw.githubusercontent.com/Guovin/iptv-api/gd/output/result.m3u"
 )
-OLD_TXT_URL = (
-    "https://www.xn--rgv465a.top/live/Daily.txt"  # 之前使用的旧 TXT 源地址
-)
+OLD_TXT_URL = "https://www.xn--rgv465a.top/live/Daily.txt"
 
-# 2. 需要保留的分类关键字（匹配到的分类才会写入最终文件）
-TARGET_CATEGORIES = ["央视", "卫视", "港澳台", "广东"]
 
-# 存储分类数据：{ "央视频道": [ ("CCTV-1", "http://..."), ... ] }
+def normalize_group_name(group_str):
+    """清理 Emoji 和符号，并将分类统一清洗重命名"""
+    # 移除表情和特殊符号，只保留汉字、字母和数字
+    cleaned = re.sub(r"[^\u4e00-\u9fa5a-zA-Z0-9]", "", group_str)
+
+    if "央视" in cleaned:
+        return "央视频道"
+    elif "卫视" in cleaned:
+        return "卫视频道"
+    elif "广东" in cleaned:
+        return "广东频道"
+    elif any(
+        k in cleaned for k in ["港", "澳", "台", "凤凰", "翡翠", "TVB", "HBO"]
+    ):
+        return "港澳台"
+    else:
+        return cleaned
+
+
+# 存储分类数据：{ "广东频道": [ ("广东珠江", "http://..."), ... ] }
 grouped_data = {}
 
 
+def add_channel(group, name, url):
+    """统一添加并归类频道"""
+    clean_group = normalize_group_name(group)
+    if not clean_group or not name or not url:
+        return
+    if clean_group not in grouped_data:
+        grouped_data[clean_group] = []
+    grouped_data[clean_group].append((name, url))
+
+
 def parse_m3u(content):
-    """解析 Guovin 的 M3U 格式源"""
+    """解析 M3U 格式"""
     lines = content.splitlines()
-    current_group = "其他频道"
+    current_group = "其他"
     current_name = ""
 
     for line in lines:
         line = line.strip()
         if line.startswith("#EXTINF"):
-            # 提取 group-title 分类名称
             group_match = re.search(r'group-title="([^"]+)"', line)
-            if group_match:
-                current_group = group_match.group(1)
-            else:
-                current_group = "其他频道"
+            current_group = group_match.group(1) if group_match else "其他"
 
-            # 提取频道名称
             if "," in line:
                 current_name = line.split(",")[-1].strip()
             else:
                 current_name = "未知频道"
 
         elif line and not line.startswith("#"):
-            # 当前行为播放链接 URL
-            url = line
             if current_name:
-                if current_group not in grouped_data:
-                    grouped_data[current_group] = []
-                # 记录频道与链接
-                grouped_data[current_group].append((current_name, url))
+                add_channel(current_group, current_name, line)
 
 
 def parse_txt(content):
-    """解析旧的 TXT 格式源"""
-    current_group = "其他频道"
+    """解析 TXT 格式"""
+    current_group = "其他"
     for line in content.splitlines():
         line = line.strip()
         if not line:
@@ -61,9 +76,7 @@ def parse_txt(content):
             parts = line.split(",")
             name = parts[0].strip()
             url = parts[1].strip()
-            if current_group not in grouped_data:
-                grouped_data[current_group] = []
-            grouped_data[current_group].append((name, url))
+            add_channel(current_group, name, url)
 
 
 # --- 1. 抓取并解析 Guovin 源 ---
@@ -75,7 +88,7 @@ try:
 except Exception as e:
     print(f"获取 Guovin 源失败: {e}")
 
-# --- 2. 抓取并合并旧源 ---
+# --- 2. 抓取并解析旧源 ---
 print("正在合并旧 TXT 源...")
 try:
     res2 = requests.get(OLD_TXT_URL, timeout=15)
@@ -84,17 +97,17 @@ try:
 except Exception as e:
     print(f"获取旧源失败/跳过: {e}")
 
-# --- 3. 去重并写入 my.txt ---
-print("正在去重并生成 my.txt...")
+# --- 3. 按照固定顺序去重并导出 ---
+OUTPUT_ORDER = ["央视频道", "卫视频道", "广东频道", "港澳台"]
+
+print("正在清洗合并并生成 my.txt...")
 with open("my.txt", "w", encoding="utf-8") as f:
-    for group, channels in grouped_data.items():
-        # 筛选包含目标关键字的分类
-        if any(target in group for target in TARGET_CATEGORIES):
+    for group in OUTPUT_ORDER:
+        if group in grouped_data and grouped_data[group]:
             f.write(f"{group},#genre#\n")
 
-            # 双重去重：避免同一个频道名绑定完全相同的 URL
             seen_pairs = set()
-            for name, url in channels:
+            for name, url in grouped_data[group]:
                 if (name, url) not in seen_pairs:
                     seen_pairs.add((name, url))
                     f.write(f"{name},{url}\n")
