@@ -6,92 +6,64 @@ GUOVIN_URL = (
 )
 DAILY_URL = "https://www.xn--rgv465a.top/live/Daily.txt"
 
-# 港澳台及海外频道的识别关键字
-HK_KEYWORDS = [
-    "港",
-    "台",
-    "澳",
-    "TVB",
-    "翡翠",
-    "明珠",
-    "凤凰",
-    "HBO",
-    "TVBS",
-]
 
-
-def normalize_channel_name(name):
-    """统一港澳台频道名称，解决 Daily 的 'TVB翡翠' 与 Guovin 的 '翡翠台' 名字不一致导致分离的问题"""
-    n = name.strip()
-
-    if "翡翠" in n:
+def normalize_name(name):
+    """把 'TVB翡翠' 和 '翡翠台' 统一命名为 '翡翠台'，实现完美合并"""
+    if "翡翠" in name:
         return "翡翠台"
-    if "明珠" in n:
+    if "明珠" in name:
         return "明珠台"
-    if "TVBS新闻" in n or "TVBS 新闻" in n:
-        return "TVBS新闻台"
-    if "TVBS亚洲" in n:
-        return "TVBS亚洲台"
-    if "TVBS综合" in n:
-        return "TVBS综合台"
-    if "凤凰中文" in n:
-        return "凤凰中文台"
-    if "凤凰资讯" in n:
-        return "凤凰资讯台"
-    if "凤凰香港" in n:
-        return "凤凰香港台"
-    if "J2" in n.upper():
-        return "J2台"
-
-    return n
+    return name.strip()
 
 
-# 1. 抓取并解析 Daily.txt（港澳台频道）
-daily_hk_channels = []
-
+# 1. 从 Daily.txt 只抓取 TVB / 翡翠台 等港台频道（Daily 优先）
+daily_hk = []
 try:
     r_daily = requests.get(DAILY_URL, timeout=15)
     r_daily.encoding = "utf-8"
     if r_daily.status_code == 200:
-        current_cat = ""
         for line in r_daily.text.splitlines():
             line = line.strip()
-            if not line:
+            if not line or "#genre#" in line:
                 continue
-
-            if "#genre#" in line:
-                current_cat = line.split(",")[0].strip()
-            elif "," in line:
+            if "," in line:
                 parts = line.split(",", 1)
                 ch_name = parts[0].strip()
                 ch_url = parts[1].strip()
 
-                combined = f"{current_cat} {ch_name}".upper()
-                if any(k.upper() in combined for k in HK_KEYWORDS):
-                    # 统一频道名字（TVB翡翠 -> 翡翠台）
-                    norm_name = normalize_channel_name(ch_name)
-                    daily_hk_channels.append((norm_name, ch_url))
-
-        print(f"Daily.txt 提取到港澳台频道 {len(daily_hk_channels)} 条")
+                # 匹配 Daily 里的 TVB、翡翠台、港台频道
+                if any(
+                    k in ch_name.upper()
+                    for k in ["TVB", "翡翠", "明珠", "TVBS", "凤凰"]
+                ):
+                    daily_hk.append((normalize_name(ch_name), ch_url))
+        print(f"Daily.txt 获取到 TVB/港台频道 {len(daily_hk)} 条")
 except Exception as e:
     print(f"Daily.txt 获取失败: {e}")
 
 
-# 2. 抓取并解析 Guovin 源
+# 2. 从 Guovin 获取央视、卫视、广东（独占），以及精准匹配 tvg-id="翡翠台" 的港台源（补充）
 guovin_data = {"央视频道": [], "卫视频道": [], "广东频道": [], "港澳台": []}
 
 try:
     r_guovin = requests.get(GUOVIN_URL, timeout=15)
     if r_guovin.status_code == 200:
-        current_group, current_name = "", ""
+        current_group, current_name, tvg_id = "", "", ""
         for line in r_guovin.text.splitlines():
             line = line.strip()
             if line.startswith("#EXTINF"):
+                # 提取 group-title
                 g_match = re.search(r'group-title="([^"]+)"', line)
                 current_group = g_match.group(1) if g_match else ""
+
+                # 提取 tvg-id（专门匹配 tvg-id="翡翠台"）
+                id_match = re.search(r'tvg-id="([^"]+)"', line)
+                tvg_id = id_match.group(1) if id_match else ""
+
                 current_name = (
                     line.split(",")[-1].strip() if "," in line else ""
                 )
+
             elif line and not line.startswith("#"):
                 if current_name:
                     g_clean = re.sub(
@@ -101,26 +73,29 @@ try:
                         r"[^\u4e00-\u9fa5a-zA-Z0-9]", "", current_name
                     )
 
-                    norm_name = normalize_channel_name(current_name)
-
+                    # 央视、卫视、广东仅使用 Guovin
                     if "央视" in g_clean or "CCTV" in n_clean.upper():
-                        guovin_data["央视频道"].append((norm_name, line))
+                        guovin_data["央视频道"].append((current_name, line))
                     elif "卫视" in g_clean:
-                        guovin_data["卫视频道"].append((norm_name, line))
+                        guovin_data["卫视频道"].append((current_name, line))
                     elif "广东" in g_clean or "广州" in n_clean:
-                        guovin_data["广东频道"].append((norm_name, line))
-                    elif any(
-                        k.upper() in (g_clean + n_clean).upper()
-                        for k in HK_KEYWORDS
+                        guovin_data["广东频道"].append((current_name, line))
+                    # 港台频道：匹配 tvg-id="翡翠台" 或 频道名/分组包含翡翠/港台
+                    elif tvg_id == "翡翠台" or any(
+                        k in (g_clean + n_clean).upper()
+                        for k in ["翡翠", "TVB", "港", "台", "澳", "凤凰"]
                     ):
-                        guovin_data["港澳台"].append((norm_name, line))
+                        guovin_data["港澳台"].append(
+                            (normalize_name(current_name), line)
+                        )
+        print("Guovin 源获取完成")
 except Exception as e:
     print(f"Guovin 获取失败: {e}")
 
 
-# 3. 按照优先级合并输出 my.txt
+# 3. 按规定顺序生成 my.txt
 with open("my.txt", "w", encoding="utf-8") as f:
-    # 央视、卫视、广东
+    # 央视、卫视、广东（仅 Guovin）
     for group in ["央视频道", "卫视频道", "广东频道"]:
         if guovin_data[group]:
             f.write(f"{group},#genre#\n")
@@ -131,8 +106,8 @@ with open("my.txt", "w", encoding="utf-8") as f:
                     f.write(f"{name},{url}\n")
             f.write("\n")
 
-    # 港澳台：Daily.txt 线路排前面，Guovin 线路紧跟在后
-    combined_hk = daily_hk_channels + guovin_data["港澳台"]
+    # 港澳台（Daily 的 TVB翡翠 排前面，Guovin 的 tvg-id="翡翠台" 排后面）
+    combined_hk = daily_hk + guovin_data["港澳台"]
     if combined_hk:
         f.write("港澳台,#genre#\n")
         seen = set()
@@ -142,4 +117,4 @@ with open("my.txt", "w", encoding="utf-8") as f:
                 f.write(f"{name},{url}\n")
         f.write("\n")
 
-print("my.txt 更新完成！")
+print("my.txt 合并更新完成！")
