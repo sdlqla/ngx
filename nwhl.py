@@ -6,14 +6,77 @@ GUOVIN_URL = (
 )
 DAILY_URL = "https://www.xn--rgv465a.top/live/Daily.txt"
 
-# 1. 解析 Guovin (获取 央视、卫视、广东，以及港澳台备用)
+# 港澳台及海外频道的扫描关键字（涵盖分类名与频道名）
+HK_KEYWORDS = [
+    "港",
+    "台",
+    "澳",
+    "TVB",
+    "翡翠",
+    "明珠",
+    "凤凰",
+    "HBO",
+    "TVBS",
+    "中天",
+    "东森",
+    "三立",
+    "星空",
+    "美亚",
+    "天映",
+    "华视",
+    "台视",
+    "中视",
+    "民视",
+    "纬来",
+    "J2",
+    "莲花",
+    "澳亚",
+    "年代",
+    "AXN",
+    "DISCOVERY",
+    "FOX",
+    "CNN",
+    "BBC",
+]
+
+# 1. 抓取并解析 Daily.txt（直接扫描频道名，确保图2中的 TVB翡翠、TVB明珠 100% 被捕获）
+daily_hk_channels = []
+
+try:
+    r_daily = requests.get(DAILY_URL, timeout=15)
+    r_daily.encoding = "utf-8"
+    if r_daily.status_code == 200:
+        current_cat = ""
+        for line in r_daily.text.splitlines():
+            line = line.strip()
+            if not line:
+                continue
+
+            if "#genre#" in line:
+                current_cat = line.split(",")[0].strip()
+            elif "," in line:
+                parts = line.split(",", 1)
+                ch_name = parts[0].strip()
+                ch_url = parts[1].strip()
+
+                # 分类名 或 频道名 只要包含关键字，就强行放入港澳台
+                combined = f"{current_cat} {ch_name}".upper()
+                if any(k.upper() in combined for k in HK_KEYWORDS):
+                    daily_hk_channels.append((ch_name, ch_url))
+
+        print(f"Daily.txt 提取到港澳台频道 {len(daily_hk_channels)} 条")
+except Exception as e:
+    print(f"Daily.txt 获取失败: {e}")
+
+
+# 2. 抓取并解析 Guovin 源
 guovin_data = {"央视频道": [], "卫视频道": [], "广东频道": [], "港澳台": []}
 
 try:
-    r1 = requests.get(GUOVIN_URL, timeout=15)
-    if r1.status_code == 200:
+    r_guovin = requests.get(GUOVIN_URL, timeout=15)
+    if r_guovin.status_code == 200:
         current_group, current_name = "", ""
-        for line in r1.text.splitlines():
+        for line in r_guovin.text.splitlines():
             line = line.strip()
             if line.startswith("#EXTINF"):
                 g_match = re.search(r'group-title="([^"]+)"', line)
@@ -37,40 +100,17 @@ try:
                     elif "广东" in g_clean or "广州" in n_clean:
                         guovin_data["广东频道"].append((current_name, line))
                     elif any(
-                        k in (g_clean + n_clean).upper()
-                        for k in ["港", "台", "澳", "TVB", "翡翠", "凤凰", "HBO"]
+                        k.upper() in (g_clean + n_clean).upper()
+                        for k in HK_KEYWORDS
                     ):
                         guovin_data["港澳台"].append((current_name, line))
 except Exception as e:
-    print(f"Guovin 解析失败: {e}")
+    print(f"Guovin 获取失败: {e}")
 
-# 2. 解析 Daily.txt (沿用你原本的思想：精准识别 港台/翡翠 分类并全量提取)
-daily_hk_channels = []
-hk_targets = ["港台", "港澳", "台湾", "香港", "翡翠", "TVB", "凤凰"]
 
-try:
-    r2 = requests.get(DAILY_URL, timeout=15)
-    if r2.status_code == 200:
-        is_target_group = False
-        for line in r2.text.splitlines():
-            line = line.strip()
-            if not line:
-                continue
-
-            # 遇到分类行，判断是否属于目标分类
-            if "#genre#" in line:
-                cat_name = line.split(",")[0].strip()
-                is_target_group = any(k in cat_name for k in hk_targets)
-            # 普通频道行，如果是目标分类则直接提取
-            elif is_target_group and "," in line:
-                parts = line.split(",", 1)
-                daily_hk_channels.append((parts[0].strip(), parts[1].strip()))
-except Exception as e:
-    print(f"Daily.txt 解析失败: {e}")
-
-# 3. 按顺序生成 my.txt
+# 3. 按照优先级合并并输出 my.txt
 with open("my.txt", "w", encoding="utf-8") as f:
-    # 写入央视、卫视、广东 (Guovin 源)
+    # 前三个分类优先使用 Guovin
     for group in ["央视频道", "卫视频道", "广东频道"]:
         if guovin_data[group]:
             f.write(f"{group},#genre#\n")
@@ -81,7 +121,7 @@ with open("my.txt", "w", encoding="utf-8") as f:
                     f.write(f"{name},{url}\n")
             f.write("\n")
 
-    # 写入港澳台 (Daily.txt 提取到的频道排最前面，Guovin 补在后面)
+    # 港澳台：Daily.txt 排最前面，Guovin 补在后面
     combined_hk = daily_hk_channels + guovin_data["港澳台"]
     if combined_hk:
         f.write("港澳台,#genre#\n")
@@ -92,4 +132,4 @@ with open("my.txt", "w", encoding="utf-8") as f:
                 f.write(f"{name},{url}\n")
         f.write("\n")
 
-print("更新完成！")
+print("my.txt 生成完成！")
