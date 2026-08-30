@@ -1,5 +1,5 @@
 🕒更新时间,#genre#
-2026-08-30 04:03:02,#
+2026-08-31 04:02:50,#
 
 央视频道,#genre#
 CCTV-1,http://63.141.230.178:82/gslb/zbdq5.m3u8?id=cctv1hd
@@ -402,10 +402,7 @@ TVB J1,http://php.jdshipin.com/TVOD/iptv.php?id=tvbj1
 TVB J1,http://php.jdshipin.com:8880/TVOD/iptv.php?id=j1
 TVB J1,http://php.jdshipin.com/TVOD/iptv.php?id=j1
 TVB J2,http://r.jdshipin.com/ndGgS
-TVB J2,http://php.jdshipin.com/TVOD/iptv.php?id=tvbp
-TVB J2,http://cdn.132.us.kg/live/tvbp/stream.m3u8
-TVB J2,http://o11.163189.xyz/stream/tvb/tvbp/
-TVB J2,http://rihou.cc:555/tv/[Pd]Plus综合
+TVB J2,http://r.jdshipin.com/Nr5jq
 Tvbs歡樂台,http://45.192.97.170:8880/play/1327.m3u8
 tvbs闽南,http://61.221.215.25:8800/hls/9/index.m3u8
 Tvbs新闻,https://live.catvod.com/live.php?id=tvbs_n
@@ -420,68 +417,54 @@ TVBS亚洲,http://38.64.72.148:80/hls/modn/list/4005/playlist.m3u8
 TVBS亚洲,http://38.64.72.148:80/hls/modn/list/4005/chunklist0.m3u8
 TVBS亚洲,http://38.64.72.148/hls/modn/list/4005/chunklist1.m3u8
 TVBS亚洲,http://38.64.72.148:80/hls/modn/list/4005/playlist.m3u8?
-Tvbs綜合台,http://xtvantsc.xyz/litv_ts.php?id=4gtv-4gtv067
-Tvbs綜合台,http://xtvantsc.xyz/litv_ts.php?id=4gtv-4gtv073
-翡翠台,http://php.jdshipin.com:8880/TVOD/iptv.php?id=fct3
-翡翠台,http://r.jdshipin.com/n90gt
-翡翠台,http://r.jdshipin.com/GeWKr
-翡翠台,http://php.jdshipin.com/TVOD/iptv.php?id=fct4
-翡翠台,http://r.jdshipin.com/GeWKr?id=fct406
 翡翠台,https://o11.163189.xyz/stream/tvb/fct4k/
-翡翠台,http://php.jdshipin.com/TVOD/iptv.php?id=fct2
+翡翠台,http://php.jdshipin.com:8880/TVOD/iptv.php?id=fct
+翡翠台,http://php.jdshipin.com/TVOD/iptv.php?id=fct3
+翡翠台,http://r.jdshipin.com/n90gt
+翡翠台,http://php.jdshipin.com:8880/TVOD/iptv.php?id=fct4
+翡翠台,http://r.jdshipin.com/GeWKr
 翡翠台,http://r.jdshipin.com/qClQf
 翡翠台,http://r.jdshipin.com/qrfbg
-翡翠台,https://cdn.163189.xyz/live/fct4k/stream.m3u8
-明珠台,http://php.jdshipin.com/TVOD/iptv.php?id=mzt
-明珠台,http://cdn6.163189.xyz/163189/mzt
-明珠台,https://o11.163189.xyz/stream/tvb/mzt/
+翡翠台,http://122.152.202.33/s/81a8a44f/index.m3u8?id=53
+翡翠台,http://120.198.95.220:9901/tsfile/live/1004_1.m3u8?key=txiptv
+明珠台,http://r.jdshipin.com/ZQ4kN
 明珠台,http://php.jdshipin.com:8880/iptv.php?id=mzt
 明珠台,http://php.jdshipin.com:8880/TVOD/iptv.php?id=mzt
 明珠台,http://r.jdshipin.com/GeWKr?id=mzt720
-明珠台,http://r.jdshipin.com/ZQ4kN
-明珠台,http://iptv.4666888.xyz/iptv2A.php?id=29
+明珠台,http://php.jdshipin.com/TVOD/iptv.php?id=mzt2
 明珠台,http://122.152.202.33/s/81a8a44f/index.m3u8?id=23
 TVB无线华丽,http://php.jdshipin.com/TVOD/iptv.php?id=huali
 TVB无线新闻,http://php.jdshipin.com/TVOD/iptv.php?id=wxxwt
 TVB无线新闻,http://php.jdshipin.com/TVOD/iptv.php?id=tvbxw
 TVB无线新闻,http://122.152.202.33/s/81a8a44f/index.m3u8?id=21
-TVB无线新闻,http://mag.trexlive.me:80/play/live.php?extension=ts&mac=00:1A:79:7E:2F:ED&stream=153399
-TVB无线新闻,http://74.91.26.218:82/live/inews.m3u8
-TVB无线新闻,https://h5cdn3.kylintv.tv/live/tvbnews_iphone.m3u8
 TVB无线星河,http://php.jdshipin.com:8880/TVOD/iptv.php?id=xinghe
-TVB无线星河,https://cdn10.123.rr.kg/163189/xinghe/
 TVB无线星河,http://r.jdshipin.com/sXuuD
 TVB无线星河,http://r.jdshipin.com/Voac4
-TVB无线星河,http://php.jdshipin.com/TVOD/iptv.php?id=tvbxh
 TVB娱乐新闻,http://php.jdshipin.com/PLTV/iptv.php?id=tvbylxw
-凤凰卫视,http://221.7.175.154:8445/tsfile/live/1020_1.m3u8?key=txiptv&playlive=1&authid=0
-凤凰卫视,http://218.104.239.114:9901/tsfile/live/1012_1.m3u8
-凤凰卫视,http://122.152.202.33/s/81a8a44f/index.m3u8?id=15
-凤凰卫视,http://61.221.215.25:8800/hls/47/index.m3u8
+凤凰卫视,http://php.jdshipin.com:8880/TVOD/iptv.php?id=fhzx
+凤凰卫视,http://r.jdshipin.com/0Rp07
 凤凰卫视,http://221.7.175.154:8445/tsfile/live/1020_1.m3u8
-凤凰卫视,http://43.152.224.209/qctv.fengshows.cn/live/0701pin72.flv
-凤凰卫视,http://218.104.239.114:9901/tsfile/live/1012_1.m3u8?key=txiptv
-凤凰卫视,http://221.7.175.154:85/tsfile/live/1021_1.m3u8?key=txiptv
-凤凰卫视,http://115.190.252.60/gangaotai/play.php?name=凤凰资讯
-凤凰卫视,https://www.faintv.com/channel/120
-凤凰香港,http://cdn6.163189.xyz/163189/fhhk
-凤凰香港,https://cdn6.163189.xyz/163189/fhhk
-凤凰香港,http://r.jdshipin.com/yDoTN
+凤凰卫视,http://221.7.175.154:8445/tsfile/live/1021_1.m3u8?key=txiptv&playlive=1&authid=0
+凤凰卫视,http://zmgd.zyrnet.com:8888/hls/109/index.m3u8
+凤凰卫视,http://218.104.239.114:9901/tsfile/live/1012_1.m3u8
+凤凰卫视,http://120.198.95.220:9901/tsfile/live/1037_1.m3u8?key=txiptv
+凤凰卫视,http://61.178.227.57:9901/tsfile/live/1014_1.m3u8?key=txiptv
+凤凰卫视,http://218.206.193.218:8888/hls/67/index.m3u8
+凤凰卫视,http://221.7.175.154:8445/tsfile/live/1020_1.m3u8?key=txiptv&playlive=1&authid=0
 凤凰香港,http://php.jdshipin.com:8880/TVOD/iptv.php?id=fhhk
-凤凰香港,http://122.152.202.33/s/81a8a44f/index.m3u8?id=fhhk
-凤凰香港,http://43.152.224.209/qctv.fengshows.cn/live/0701phk72.flv
-凤凰香港,http://115.190.252.60/gangaotai/play.php?name=凤凰香港
-凤凰香港,https://www.faintv.com/channel/18965
+凤凰香港,http://r.jdshipin.com/NfC0f
+凤凰香港,http://php.jdshipin.com/TVOD/iptv.php?id=fhhk
+凤凰香港,http://61.178.227.57:9901/tsfile/live/1012_1.m3u8?key=txiptv
+凤凰中文,http://r.jdshipin.com/cCCzW
+凤凰中文,http://php.jdshipin.com:8880/TVOD/iptv.php?id=fhzw
 凤凰中文,https://live.264788.xyz/channel/fenghuangweishizhongwen?streamid=3ed416f2709e7ecaf6dc1b9d9c66bb5e&livekey=01WgOR41rriMmMkzNsd0UoaxJRwetZdxIvtVk
-凤凰中文,http://cdn6.163189.xyz/163189/fhzw
-凤凰中文,https://cdn.qd.je/163189.php?id=fhzw
-凤凰中文,http://221.7.175.154:85/tsfile/live/1020_1.m3u8?key=txiptv&playlive=1&authid=0
-凤凰中文,http://218.206.193.218:8888/hls/66/index.m3u8
-凤凰中文,http://zmgd.zyrnet.com:8888/hls/110/index.m3u8
+凤凰中文,https://live.264788.xyz/channel/fenghuangweishizhongwen?streamid=2f797f6963d4df5f391f48edfa50ff59&livekey=01WgOR41rriMmMkzNsd0UoaxJRwetZdxIvtVk
+凤凰中文,http://rihou.cc:555/tv/[Pd]凤凰中文
 凤凰中文,http://218.104.239.114:9901/tsfile/live/1013_1.m3u8
-凤凰中文,http://221.7.175.154:85/tsfile/live/1020_1.m3u8?key=txiptv
+凤凰中文,http://183.237.95.108:9901/tsfile/live/1103_1.m3u8?key=txiptv&playlive=0&authid=0
+凤凰中文,http://218.206.193.218:8888/hls/66/index.m3u8
+凤凰中文,http://120.198.95.220:9901/tsfile/live/1036_1.m3u8?key=txiptv
 凤凰中文,http://219.145.93.74:10000/tsfile/live/1002_1.m3u8?key=txiptv&playlive=1&authid=0
-凤凰中文,http://182.135.66.163:1888/rtp/239.94.2.52:5140
 凤凰资讯,http://171.213.129.2:4023/rtp/239.94.2.49:5140
 凤凰资讯,http://171.213.129.2:4023/rtp/239.94.2.50:5140
 凤凰资讯,http://122.245.152.225:50000/rtp/233.50.202.36:5140
@@ -514,8 +497,8 @@ TVB娱乐新闻,http://php.jdshipin.com/PLTV/iptv.php?id=tvbylxw
 凤凰资讯,http://php.jdshipin.com/TVOD/iptv.php?id=fhzx
 凤凰资讯,https://cdn6.163189.xyz/163189/fhzx
 凤凰资讯,https://hls-gateway.vpstv.net/streams/476958.m3u8
-凤凰香港,http://r.jdshipin.com/NfC0f
-凤凰香港,http://php.jdshipin.com/TVOD/iptv.php?id=fhhk
+凤凰香港,http://r.jdshipin.com/yDoTN
+凤凰香港,https://cdn6.163189.xyz/163189/fhhk
 凤凰香港,https://epg.pw/stream/5f16dc7fc8aaaed3205516c63e4a8c24bca9dbba1181684244729cf574505b0e.m3u8
 凤凰卫视,https://7612-5516-affc-d88b.kylintv.tv/live/pxinhd_iphone.m3u8
 香港卫视,http://cctvtxyh5c.liveplay.myqcloud.com/cstv/xianggangweishi_2/index.m3u8
