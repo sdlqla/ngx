@@ -2,7 +2,7 @@ import re
 import requests
 from datetime import datetime, timedelta, timezone
 
-GUOVIN_URL = "https://raw.githubusercontent.com/Guovin/iptv-api/gd/output/result.m3u"
+GUOVIN_URL = "https://live.776512.xyz"
 DAILY_URL = "https://www.xn--rgv465a.top/live/Daily.txt"
 
 def normalize_name(name):
